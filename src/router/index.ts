@@ -8,7 +8,7 @@ import AdminPage from '@/pages/AdminPage.vue'
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'student', component: StudentPage },
-    { path: '/admin', name: 'admin', component: AdminPage }
+    { path: '/ntust-work-PPST', name: 'student', component: StudentPage },
+    { path: '/ntust-work-PPST/admin', name: 'admin', component: AdminPage }
   ]
 })
