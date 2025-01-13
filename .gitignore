@@ -25,4 +25,3 @@ dist-ssr
 *.sw?
 
 .vscode/extensions.json
-package-lock.json
