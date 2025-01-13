@@ -9,6 +9,6 @@ export const router = createRouter({
   history: createWebHistory('ntust-work-PPST'),
   routes: [
     { path: '/', name: 'student', component: StudentPage },
-    { path: '/admin', name: 'admin', component: AdminPage }
+    { path: '/admin/', name: 'admin', component: AdminPage }
   ]
 })
