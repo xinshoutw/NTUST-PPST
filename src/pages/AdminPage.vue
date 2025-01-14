@@ -280,9 +280,9 @@ function scoreColor(score: number | null, test: any): string {
 
   // 提取有效分數並排序，使用複製數組的方式避免修改原數據
   const validScores = [...test.responses]
-    .map((resp) => resp.result_score)
-    .filter((s): s is number => s !== null)
-    .sort((a, b) => a - b)
+      .map((resp) => resp.result_score)
+      .filter((s): s is number => s !== null)
+      .sort((a, b) => a - b)
 
   // 如果沒有有效分數，返回空字串
   if (!validScores.length) return ''
@@ -293,9 +293,9 @@ function scoreColor(score: number | null, test: any): string {
   const rest = pos - base
 
   const q3 =
-    validScores[base + 1] !== undefined
-      ? validScores[base] + rest * (validScores[base + 1] - validScores[base])
-      : validScores[base]
+      validScores[base + 1] !== undefined
+          ? validScores[base] + rest * (validScores[base + 1] - validScores[base])
+          : validScores[base]
 
   // 返回對應的顏色 class
   return score > q3 ? 'score-high' : 'score-low'
