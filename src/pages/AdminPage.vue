@@ -275,39 +275,30 @@ function formatTime(dateStr: string) {
  * @returns 分數對應的 CSS class
  */
 
-function scoreColor(score: number | null, test: any) {
-  if (score == null) return ''
-  const validScores = test.responses
-      .map((resp) => resp.result_score)
-      .filter((s) => s !== null)
+function scoreColor(score: number | null, test: any): string {
+  if (score === null) return '' // 如果分數為 null，返回空字串
+
+  // 提取有效分數並排序，使用複製數組的方式避免修改原數據
+  const validScores = [...test.responses]
+    .map((resp) => resp.result_score)
+    .filter((s): s is number => s !== null)
+    .sort((a, b) => a - b)
+
+  // 如果沒有有效分數，返回空字串
   if (!validScores.length) return ''
-  const q3 = validScores.sort((a, b) => a - b)[
-      Math.floor((validScores.length - 1) * 0.75)
-      ]
-  return score > q3 ? 'score-high' : 'score-low'
-}
 
-/**
- * 計算主題的四分位距 Q3，用於判斷高分與否
- * @param test - 該主題資料，包含 responses
- * @returns Q3 的數值
- */
-function calcQ3ForTest(test: any): number {
-  const validScores = test.responses
-      .map((r: any) => r.result_score)
-      .filter((s: number | null) => s !== null)
-      .sort((a: number, b: number) => a - b)
-
-  if (!validScores.length) return 0
-
+  // 計算 Q3 (四分位上界)
   const pos = (validScores.length - 1) * 0.75
   const base = Math.floor(pos)
   const rest = pos - base
-  if (validScores[base + 1] !== undefined) {
-    return validScores[base] + rest * (validScores[base + 1] - validScores[base])
-  } else {
-    return validScores[base]
-  }
+
+  const q3 =
+    validScores[base + 1] !== undefined
+      ? validScores[base] + rest * (validScores[base + 1] - validScores[base])
+      : validScores[base]
+
+  // 返回對應的顏色 class
+  return score > q3 ? 'score-high' : 'score-low'
 }
 </script>
 
