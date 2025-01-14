@@ -4,7 +4,7 @@ import {ref} from 'vue'
 /**
  * 單一題目與答案
  */
-export interface QuestionAnswer {
+interface QuestionAnswer {
     q: string
     a: number | string
 }
@@ -12,18 +12,18 @@ export interface QuestionAnswer {
 /**
  * 學生填寫的量表
  */
-export interface TestData {
+interface TestData {
     test_name: string
     test_time: string
-    result_score: number | null
-    question_answer?: QuestionAnswer[]
-    questions?: QuestionAnswer[]
+    result_scores: ScoreData[]
+    question_answer: QuestionAnswer[]
+    questions: QuestionAnswer[]
 }
 
 /**
  * 學生基本資訊
  */
-export interface StudentInfo {
+interface StudentInfo {
     student_id: string
     student_name: string
     gender: number

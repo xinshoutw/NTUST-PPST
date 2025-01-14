@@ -64,9 +64,8 @@
           <div class="card-header">
             <div class="title-row">
               <h3>{{ test.test_name }}</h3>
-              <small class="people-count">({{ test.responses.length }} 人參與)</small>
             </div>
-            <span class="test-score">平均：{{ test.average_score ?? '無' }}</span>
+            <span class="people-count">{{ test.responses.length }} 人</span>
           </div>
           <!-- 下方為展開使用者清單 -->
           <transition name="expand-detail">
@@ -80,12 +79,22 @@
               >
                 <div class="user-header">
                   <h4>{{ resp.student_id }} | {{ resp.student_name }}</h4>
-                  <span
-                      :class="scoreColor(resp.result_score, test)"
-                      class="user-score"
-                  >
-                    分數：{{ resp.result_score ?? '無' }}
-                  </span>
+                  <div class="score-badge-container user-scores">
+                    <template v-if="resp.result_scores && resp.result_scores.length > 0">
+                    <span
+                        v-for="(scoreItem, sIdx) in resp.result_scores"
+                        :key="sIdx"
+                        class="badge"
+                    >
+                      <strong>{{ scoreItem.subject_name }}</strong>
+                      <span class="badge-space"></span>
+                      {{ scoreItem.score }}
+                    </span>
+                    </template>
+                    <template v-else>
+                      <span class="no-score">無</span>
+                    </template>
+                  </div>
                 </div>
                 <p class="test-time">
                   {{ formatTime(resp.test_time) }}
@@ -167,33 +176,41 @@ async function handleLogin() {
 }
 
 /**
- * 根據性別、學號（模糊搜尋）即時過濾 aggregatedData
+ * 根據性別、學號、姓名（模糊搜尋）即時過濾 aggregatedData，
+ * 並支持多關鍵字以「及」過濾。
  * @returns 過濾後的主題陣列
  */
 const filteredData = computed(() => {
-  let tempData = aggregatedData.value
+  let tempData = aggregatedData.value;
 
+  // 根據性別篩選
   if (filterGender.value) {
     tempData = tempData.map((test) => ({
       ...test,
       responses: test.responses.filter(
           (resp) => resp.gender.toString() === filterGender.value
       ),
-    }))
+    }));
   }
 
+  // 根據學號與姓名模糊搜尋篩選
   if (filterStudentId.value.trim()) {
-    const keyword = filterStudentId.value.trim().toLowerCase()
+    const keywords = filterStudentId.value.trim().toLowerCase().split(/\s+/); // 將輸入依空白分割為多個關鍵字
+
     tempData = tempData.map((test) => ({
       ...test,
-      responses: test.responses.filter((resp) =>
-          resp.student_id.toLowerCase().includes(keyword)
-      ),
-    }))
+      responses: test.responses.filter((resp) => {
+        // 確保每個關鍵字都符合才保留資料
+        return keywords.every((keyword) =>
+            resp.student_id.toLowerCase().includes(keyword) ||
+            resp.student_name.toLowerCase().includes(keyword)
+        );
+      }),
+    }));
   }
 
-  return tempData
-})
+  return tempData;
+});
 
 /**
  * 若主題只剩 1 位使用者，就自動展開
@@ -268,37 +285,6 @@ function formatTime(dateStr: string) {
     minute: '2-digit',
     second: '2-digit',
   })
-}
-
-/**
- * 根據 Q3 計算，若分數 > Q3 → 綠色 (score-high)；否則橘色 (score-low)
- * @returns 分數對應的 CSS class
- */
-
-function scoreColor(score: number | null, test: any): string {
-  if (score === null) return '' // 如果分數為 null，返回空字串
-
-  // 提取有效分數並排序，使用複製數組的方式避免修改原數據
-  const validScores = [...test.responses]
-      .map((resp) => resp.result_score)
-      .filter((s): s is number => s !== null)
-      .sort((a, b) => a - b)
-
-  // 如果沒有有效分數，返回空字串
-  if (!validScores.length) return ''
-
-  // 計算 Q3 (四分位上界)
-  const pos = (validScores.length - 1) * 0.75
-  const base = Math.floor(pos)
-  const rest = pos - base
-
-  const q3 =
-      validScores[base + 1] !== undefined
-          ? validScores[base] + rest * (validScores[base + 1] - validScores[base])
-          : validScores[base]
-
-  // 返回對應的顏色 class
-  return score > q3 ? 'score-high' : 'score-low'
 }
 </script>
 
@@ -461,12 +447,7 @@ h1 {
 
 .people-count {
   color: #888;
-  font-size: 0.85rem;
-}
-
-.test-score {
   font-size: 0.9rem;
-  color: #bf360c;
   font-weight: bold;
 }
 
@@ -511,14 +492,6 @@ h1 {
   font-weight: bold;
 }
 
-.score-high {
-  color: #388e3c;
-}
-
-.score-low {
-  color: #ffa726;
-}
-
 .test-time {
   font-size: 0.85rem;
   color: #777;
@@ -549,7 +522,7 @@ h1 {
   font-size: 1rem;
   color: #444;
   background-color: #fffaeb;
-  border-left: 4px solid #ffa726;
+  border-left: 4px solid #5569af;
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
 }
@@ -590,4 +563,40 @@ h1 {
     font-size: 16px;
   }
 }
+
+/* score-badge-container (在 user-scores 容器內使用) */
+.score-badge-container.user-scores {
+  display: flex;
+  flex-wrap: wrap; /* 分數過多時自動換行 */
+  gap: 0.5rem;
+  justify-content: flex-end; /* 右對齊，可依需求改成 flex-start */
+  align-items: center;
+}
+
+/* 單個分數 badge：橢圓形實心色塊 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #5569af;
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: default; /* 或 auto，避免看起來像可點擊 */
+  font-weight: bold;
+}
+
+/* 主題與分數之間的小空隙 */
+.badge-space {
+  display: inline-block;
+  width: 6px;
+}
+
+/* 若沒有任何分數顯示時的樣式 */
+.no-score {
+  font-size: 0.9rem;
+  color: #bf360c;
+  font-weight: bold;
+}
+
 </style>

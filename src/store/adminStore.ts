@@ -6,17 +6,17 @@ import {ref} from 'vue'
  */
 interface AdminTestData {
     test_name: string
-    average_score: number | null
     questions: string[]
     responses: {
         student_id: string
         student_name: string
         gender: number
         test_time: string
-        result_score: number | null
+        result_scores: ScoreData[]
         answers: (number | string)[]
     }[]
 }
+
 
 /**
  * Pinia Store：管理者狀態
