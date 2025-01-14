@@ -4,14 +4,14 @@
 
 ## 專案結構
 
-- `index.html`：前端入口檔  
-- `vite.config.ts`：Vite 主要設定，內含 `alias` 設定  
-- `src/main.ts`：Vue 應用程式進入點  
-- `src/router`：路由設定 (Vue Router)  
-- `src/store`：以 Pinia 管理的全域狀態  
-- `src/utils/api.ts`：與後端通訊的 API 函式  
-- `src/pages`：`StudentPage.vue`、`AdminPage.vue` 等頁面  
-- `src/style.css`：全域樣式  
+- `index.html`：前端入口檔
+- `vite.config.ts`：Vite 主要設定，內含 `alias` 設定
+- `src/main.ts`：Vue 應用程式進入點
+- `src/router`：路由設定 (Vue Router)
+- `src/store`：以 Pinia 管理的全域狀態
+- `src/utils/api.ts`：與後端通訊的 API 函式
+- `src/pages`：`StudentPage.vue`、`AdminPage.vue` 等頁面
+- `src/style.css`：全域樣式
 
 ## 安裝與運行
 
@@ -37,15 +37,15 @@
 
 ## 主要功能
 
-- **學生登入**：  
-  1. 使用者輸入學號與密碼  
-  2. 呼叫後端 API 取得學生資訊與量表資料  
-  3. 顯示量表清單，支援卡片展開看詳情  
+- **學生登入**：
+    1. 使用者輸入學號與密碼
+    2. 呼叫後端 API 取得學生資訊與量表資料
+    3. 顯示量表清單，支援卡片展開看詳情
 
-- **管理者後台**：  
-  1. 輸入管理者 Token 取得所有主題與作答資料  
-  2. 使用者卡片呈現，多重展開  
-  3. 分數四分位距、顯示高分或低分顏色  
+- **管理者後台**：
+    1. 輸入管理者 Token 取得所有主題與作答資料
+    2. 使用者卡片呈現，多重展開
+    3. 分數四分位距、顯示高分或低分顏色
 
 ## 授權
 

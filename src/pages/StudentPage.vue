@@ -9,25 +9,25 @@
           <label>學號</label>
           <input
               v-model="username"
-              type="text"
-              name="username"
               class="form-input"
+              name="username"
               placeholder="請輸入學號"
               required
+              type="text"
           />
         </div>
         <div class="form-group">
           <label>密碼</label>
           <input
               v-model="password"
-              type="password"
-              name="password"
               class="form-input"
+              name="password"
               placeholder="請輸入密碼"
               required
+              type="password"
           />
         </div>
-        <button type="submit" class="btn-login">登入</button>
+        <button class="btn-login" type="submit">登入</button>
       </form>
       <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
     </div>
@@ -44,17 +44,17 @@
         Hello, {{ studentInfo?.student_id }} | {{ studentInfo?.student_name }}
       </p>
       <transition-group
+          :style="{ width: cardWidth }"
+          class="card-list"
           name="card-transition"
           tag="div"
-          class="card-list"
-          :style="{ width: cardWidth }"
       >
         <div
-            class="test-card"
             v-for="(test, index) in testsDataSorted"
             :key="test.test_name + index"
-            @click="toggleDetail(index)"
             :style="{ width: cardWidth }"
+            class="test-card"
+            @click="toggleDetail(index)"
         >
           <div class="card-header">
             <h3>{{ test.test_name }}</h3>
@@ -79,7 +79,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {useStudentStore} from '@/store/studentStore'
 import {get_user_data} from '@/utils/api'
