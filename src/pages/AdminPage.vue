@@ -2,21 +2,21 @@
   <div class="admin-page">
     <h1>正向心理學 - 管理者後台</h1>
 
-    <!-- 若尚未登入，輸入 Token -->
+    <!-- 未登入：顯示登入表單 -->
     <div v-if="!token && !isLoading" class="login-container">
       <form class="login-form" @submit.prevent="handleLogin">
         <div class="form-group">
           <label>請輸入 Token</label>
           <input
               v-model="adminTokenInput"
-              type="password"
-              name="token"
               class="form-input"
+              name="token"
               placeholder="請輸入 Token"
               required
+              type="password"
           />
         </div>
-        <button type="submit" class="btn-login">登入</button>
+        <button class="btn-login" type="submit">登入</button>
       </form>
       <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
     </div>
@@ -27,7 +27,7 @@
       <p>載入中...</p>
     </div>
 
-    <!-- 已登入：顯示多主題卡片 & 過濾區 -->
+    <!-- 已登入：顯示主題列表 -->
     <div v-else>
       <div class="filters">
         <div class="filter-group">
@@ -40,9 +40,9 @@
         <div class="filter-group">
           <input
               v-model="filterStudentId"
-              type="text"
               class="form-input"
               placeholder="輸入關鍵字"
+              type="text"
           />
         </div>
       </div>
@@ -53,38 +53,36 @@
       </div>
 
       <!-- 主題卡片列表 -->
-      <transition-group name="card-transition" tag="div" class="test-cards" v-else>
+      <transition-group class="test-cards" name="card-transition" tag="div">
         <div
-            class="test-card"
+            v-for="(test, testIndex) in filteredData"
+            :key="test.test_name + testIndex"
             :style="{ width: cardWidth }"
-            v-for="(test, index) in filteredData"
-            :key="test.test_name + index"
-            @click="toggleTestDetail(index)"
+            class="test-card"
+            @click="toggleTestDetail(testIndex)"
         >
           <div class="card-header">
             <div class="title-row">
               <h3>{{ test.test_name }}</h3>
               <small class="people-count">({{ test.responses.length }} 人參與)</small>
             </div>
-            <span class="test-score">
-              平均：{{ test.average_score ?? '無' }}
-            </span>
+            <span class="test-score">平均：{{ test.average_score ?? '無' }}</span>
           </div>
           <!-- 下方為展開使用者清單 -->
           <transition name="expand-detail">
             <!-- 若 openedTestIndices 包含當前 index，表示展開 -->
-            <div v-if="openedTestIndices.includes(index)" class="test-detail">
+            <div v-if="openedTestIndices.includes(testIndex)" class="test-detail">
               <div
-                  v-for="(resp, respIdx) in sortedResponses(test.responses)"
-                  :key="resp.student_id + respIdx"
+                  v-for="(resp, userIndex) in sortedResponses(test.responses)"
+                  :key="resp.student_id + userIndex"
                   class="user-card"
-                  @click.stop="toggleUserDetail(respIdx)"
+                  @click.stop="toggleUserDetail(testIndex, userIndex)"
               >
                 <div class="user-header">
                   <h4>{{ resp.student_id }} | {{ resp.student_name }}</h4>
                   <span
-                      class="user-score"
                       :class="scoreColor(resp.result_score, test)"
+                      class="user-score"
                   >
                     分數：{{ resp.result_score ?? '無' }}
                   </span>
@@ -94,7 +92,10 @@
                 </p>
 
                 <transition name="expand-detail">
-                  <div v-if="openedUserIndex === respIdx" class="user-detail">
+                  <div
+                      v-if="openedUserIndices[testIndex]?.includes(userIndex)"
+                      class="user-detail"
+                  >
                     <div
                         v-for="(q, qIndex) in test.questions"
                         :key="qIndex"
@@ -116,7 +117,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref, watch} from 'vue'
 import {useAdminStore} from '@/store/adminStore'
 import {get_data} from '@/utils/api'
@@ -139,8 +140,8 @@ const filterStudentId = ref('')
 /* 主題展開清單（可同時展開多個） */
 const openedTestIndices = ref<number[]>([])
 
-/* 使用者展開索引（一次只展開一位使用者卡） */
-const openedUserIndex = ref<number | null>(null)
+/* 使用者展開狀態 */
+const openedUserIndices = ref<{ [testIndex: number]: number[] }>({})
 
 /* 取得字卡寬度 */
 const {cardWidth} = useCardWidth()
@@ -152,14 +153,14 @@ async function handleLogin() {
   isLoading.value = true
   errorMessage.value = ''
   try {
-    const dataRes = await get_data(adminTokenInput.value)
-    if (dataRes.status) {
+    const res = await get_data(adminTokenInput.value)
+    if (res.status) {
       adminStore.setToken(adminTokenInput.value)
-      adminStore.setAggregatedData(dataRes.data || [])
+      adminStore.setAggregatedData(res.data || [])
     } else {
-      errorMessage.value = '無法取得填寫資料'
+      errorMessage.value = '無法取得資料'
     }
-  } catch (err) {
+  } catch {
     errorMessage.value = '系統錯誤'
   }
   isLoading.value = false
@@ -173,22 +174,22 @@ const filteredData = computed(() => {
   let tempData = aggregatedData.value
 
   if (filterGender.value) {
-    tempData = tempData.map(testItem => {
-      const filteredRes = testItem.responses.filter(
-          r => r.gender.toString() === filterGender.value
-      )
-      return {...testItem, responses: filteredRes}
-    })
+    tempData = tempData.map((test) => ({
+      ...test,
+      responses: test.responses.filter(
+          (resp) => resp.gender.toString() === filterGender.value
+      ),
+    }))
   }
 
   if (filterStudentId.value.trim()) {
     const keyword = filterStudentId.value.trim().toLowerCase()
-    tempData = tempData.map(testItem => {
-      const filteredRes = testItem.responses.filter(
-          r => r.student_id.toLowerCase().includes(keyword)
-      )
-      return {...testItem, responses: filteredRes}
-    })
+    tempData = tempData.map((test) => ({
+      ...test,
+      responses: test.responses.filter((resp) =>
+          resp.student_id.toLowerCase().includes(keyword)
+      ),
+    }))
   }
 
   return tempData
@@ -212,24 +213,36 @@ watch(
 
 /**
  * 切換是否展開主題卡
- * @param index - 該主題卡索引
+ * @param testIndex - 該主題卡索引
  */
-function toggleTestDetail(index: number) {
-  openedUserIndex.value = null
-  const i = openedTestIndices.value.indexOf(index)
-  if (i > -1) {
-    openedTestIndices.value.splice(i, 1)
+function toggleTestDetail(testIndex: number) {
+  if (openedTestIndices.value.includes(testIndex)) {
+    openedTestIndices.value = openedTestIndices.value.filter(
+        (index) => index !== testIndex
+    )
+    delete openedUserIndices.value[testIndex]
   } else {
-    openedTestIndices.value.push(index)
+    openedTestIndices.value.push(testIndex)
+    openedUserIndices.value[testIndex] = []
   }
 }
 
 /**
  * 切換是否展開使用者卡
- * @param uIndex - 使用者卡索引
+ * @param testIndex - 主題卡索引
+ * @param userIndex - 使用者卡索引
  */
-function toggleUserDetail(uIndex: number) {
-  openedUserIndex.value = openedUserIndex.value === uIndex ? null : uIndex
+function toggleUserDetail(testIndex: number, userIndex: number) {
+  if (!openedUserIndices.value[testIndex]) {
+    openedUserIndices.value[testIndex] = []
+  }
+  const userList = openedUserIndices.value[testIndex]
+  const userIndexPos = userList.indexOf(userIndex)
+  if (userIndexPos > -1) {
+    userList.splice(userIndexPos, 1)
+  } else {
+    userList.push(userIndex)
+  }
 }
 
 /**
@@ -247,26 +260,30 @@ function sortedResponses(responses: any[]) {
  * @returns 「yyyy/MM/dd HH:mm:ss」易讀格式
  */
 function formatTime(dateStr: string) {
-  const d = new Date(dateStr)
-  return d.toLocaleString('zh-TW', {
+  return new Date(dateStr).toLocaleString('zh-TW', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit'
+    second: '2-digit',
   })
 }
 
 /**
  * 根據 Q3 計算，若分數 > Q3 → 綠色 (score-high)；否則橘色 (score-low)
- * @param score - 使用者分數
- * @param test - 該主題資料，內含 responses
  * @returns 分數對應的 CSS class
  */
-function scoreColor(score: number | null, test: any): string {
+
+function scoreColor(score: number | null, test: any) {
   if (score == null) return ''
-  const q3 = calcQ3ForTest(test)
+  const validScores = test.responses
+      .map((resp) => resp.result_score)
+      .filter((s) => s !== null)
+  if (!validScores.length) return ''
+  const q3 = validScores.sort((a, b) => a - b)[
+      Math.floor((validScores.length - 1) * 0.75)
+      ]
   return score > q3 ? 'score-high' : 'score-low'
 }
 
