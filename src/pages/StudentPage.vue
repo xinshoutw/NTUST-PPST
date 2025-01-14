@@ -59,7 +59,7 @@
           <!-- 左側標題 + 右側分數區塊 -->
           <div class="header-title">
             <div class="title-row">
-            <h3>{{ test.test_name }}</h3>
+              <h3>{{ test.test_name }}</h3>
             </div>
             <div class="header-scores">
               <div class="score-badge-container">
