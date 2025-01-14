@@ -1,6 +1,11 @@
 import axios from 'axios'
 
 /**
+ * Google Apps Script Endpoint
+ */
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyecx6IaUNPft9gLr6r6DziyFWxfG3OXRxPCi5PpnSETzp7JNqRFqn80RVwkPmT4icJ/exec'
+
+/**
  * 將數值四捨五入到小數點後第二位
  * @param num - 輸入數值或 null
  * @returns 四捨五入到小數點兩位的結果，或 null
@@ -47,7 +52,7 @@ export async function get_user_data(
 ): Promise<GetUserDataResponse> {
     try {
         const res = await axios.post<GetUserDataResponse>(
-            'https://script.google.com/macros/s/AKfycbyecx6IaUNPft9gLr6r6DziyFWxfG3OXRxPCi5PpnSETzp7JNqRFqn80RVwkPmT4icJ/exec',
+            ENDPOINT,
             `{"sid":"${username}","pwd":"${password}"}`,
             {
                 headers: {
@@ -109,7 +114,7 @@ export type GetDataResponse = GetDataSuccess | GetDataFail
 export async function get_data(token_key: string): Promise<GetDataResponse> {
     try {
         const res = await axios.post<GetDataResponse>(
-            'https://script.google.com/macros/s/AKfycbyecx6IaUNPft9gLr6r6DziyFWxfG3OXRxPCi5PpnSETzp7JNqRFqn80RVwkPmT4icJ/exec',
+            ENDPOINT,
             `{"token":"${token_key}"}`,
             {
                 headers: {
