@@ -8,12 +8,12 @@
         <div class="form-group">
           <label>請輸入 Token</label>
           <input
-            v-model="adminTokenInput"
-            type="password"
-            name="token"
-            class="form-input"
-            placeholder="請輸入 Token"
-            required
+              v-model="adminTokenInput"
+              type="password"
+              name="token"
+              class="form-input"
+              placeholder="請輸入 Token"
+              required
           />
         </div>
         <button type="submit" class="btn-login">登入</button>
@@ -39,10 +39,10 @@
         </div>
         <div class="filter-group">
           <input
-            v-model="filterStudentId"
-            type="text"
-            class="form-input"
-            placeholder="輸入關鍵字"
+              v-model="filterStudentId"
+              type="text"
+              class="form-input"
+              placeholder="輸入關鍵字"
           />
         </div>
       </div>
@@ -55,10 +55,11 @@
       <!-- 主題卡片列表 -->
       <transition-group name="card-transition" tag="div" class="test-cards" v-else>
         <div
-          class="test-card"
-          v-for="(test, index) in filteredData"
-          :key="test.test_name + index"
-          @click="toggleTestDetail(index)"
+            class="test-card"
+            :style="{ width: cardWidth }"
+            v-for="(test, index) in filteredData"
+            :key="test.test_name + index"
+            @click="toggleTestDetail(index)"
         >
           <div class="card-header">
             <div class="title-row">
@@ -74,16 +75,16 @@
             <!-- 若 openedTestIndices 包含當前 index，表示展開 -->
             <div v-if="openedTestIndices.includes(index)" class="test-detail">
               <div
-                v-for="(resp, respIdx) in sortedResponses(test.responses)"
-                :key="resp.student_id + respIdx"
-                class="user-card"
-                @click.stop="toggleUserDetail(respIdx)"
+                  v-for="(resp, respIdx) in sortedResponses(test.responses)"
+                  :key="resp.student_id + respIdx"
+                  class="user-card"
+                  @click.stop="toggleUserDetail(respIdx)"
               >
                 <div class="user-header">
                   <h4>{{ resp.student_id }} | {{ resp.student_name }}</h4>
                   <span
-                    class="user-score"
-                    :class="scoreColor(resp.result_score, test)"
+                      class="user-score"
+                      :class="scoreColor(resp.result_score, test)"
                   >
                     分數：{{ resp.result_score ?? '無' }}
                   </span>
@@ -95,9 +96,9 @@
                 <transition name="expand-detail">
                   <div v-if="openedUserIndex === respIdx" class="user-detail">
                     <div
-                      v-for="(q, qIndex) in test.questions"
-                      :key="qIndex"
-                      class="qa-item"
+                        v-for="(q, qIndex) in test.questions"
+                        :key="qIndex"
+                        class="qa-item"
                     >
                       <div class="qa-question">{{ q }}</div>
                       <div class="qa-answer">
@@ -116,9 +117,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useAdminStore } from '@/store/adminStore'
-import { get_data } from '@/utils/api'
+import {computed, ref, watch} from 'vue'
+import {useAdminStore} from '@/store/adminStore'
+import {get_data} from '@/utils/api'
+import {useCardWidth} from '@/utils/useCardWidth'
 
 /* 從 store 取得管理者相關狀態 */
 const adminStore = useAdminStore()
@@ -139,6 +141,9 @@ const openedTestIndices = ref<number[]>([])
 
 /* 使用者展開索引（一次只展開一位使用者卡） */
 const openedUserIndex = ref<number | null>(null)
+
+/* 取得字卡寬度 */
+const {cardWidth} = useCardWidth()
 
 /**
  * 發送 Token 到後端以取得管理者數據
@@ -170,9 +175,9 @@ const filteredData = computed(() => {
   if (filterGender.value) {
     tempData = tempData.map(testItem => {
       const filteredRes = testItem.responses.filter(
-        r => r.gender.toString() === filterGender.value
+          r => r.gender.toString() === filterGender.value
       )
-      return { ...testItem, responses: filteredRes }
+      return {...testItem, responses: filteredRes}
     })
   }
 
@@ -180,9 +185,9 @@ const filteredData = computed(() => {
     const keyword = filterStudentId.value.trim().toLowerCase()
     tempData = tempData.map(testItem => {
       const filteredRes = testItem.responses.filter(
-        r => r.student_id.toLowerCase().includes(keyword)
+          r => r.student_id.toLowerCase().includes(keyword)
       )
-      return { ...testItem, responses: filteredRes }
+      return {...testItem, responses: filteredRes}
     })
   }
 
@@ -193,16 +198,16 @@ const filteredData = computed(() => {
  * 若主題只剩 1 位使用者，就自動展開
  */
 watch(
-  filteredData,
-  newVal => {
-    openedTestIndices.value = []
-    newVal.forEach((test, idx) => {
-      if (test.responses.length === 1) {
-        openedTestIndices.value.push(idx)
-      }
-    })
-  },
-  { immediate: true }
+    filteredData,
+    newVal => {
+      openedTestIndices.value = []
+      newVal.forEach((test, idx) => {
+        if (test.responses.length === 1) {
+          openedTestIndices.value.push(idx)
+        }
+      })
+    },
+    {immediate: true}
 )
 
 /**
@@ -272,9 +277,9 @@ function scoreColor(score: number | null, test: any): string {
  */
 function calcQ3ForTest(test: any): number {
   const validScores = test.responses
-    .map((r: any) => r.result_score)
-    .filter((s: number | null) => s !== null)
-    .sort((a: number, b: number) => a - b)
+      .map((r: any) => r.result_score)
+      .filter((s: number | null) => s !== null)
+      .sort((a: number, b: number) => a - b)
 
   if (!validScores.length) return 0
 
@@ -300,10 +305,12 @@ function calcQ3ForTest(test: any): number {
   padding: 1rem;
   font-family: Arial, sans-serif;
 }
+
 h1 {
   margin-bottom: 1rem;
   font-size: 1.5rem;
 }
+
 .login-container {
   width: 100%;
   max-width: 400px;
@@ -313,16 +320,19 @@ h1 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
 }
+
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .form-group label {
   margin-bottom: 0.5rem;
   display: block;
   font-weight: 600;
 }
+
 .form-input {
   width: 100%;
   padding: 0.5rem;
@@ -330,6 +340,7 @@ h1 {
   border-radius: 4px;
   font-size: 1rem;
 }
+
 .btn-login {
   background-color: #ffa726;
   color: #fff;
@@ -339,14 +350,17 @@ h1 {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .btn-login:hover {
   background-color: #ff9100;
 }
+
 .error-text {
   color: #ff4141;
   margin-top: 0.5rem;
   text-align: center;
 }
+
 /* 過濾區 */
 .filters {
   display: flex;
@@ -357,11 +371,13 @@ h1 {
   max-width: 800px;
   justify-content: center;
 }
+
 .filter-group {
   display: flex;
   flex-direction: column;
   font-weight: 600;
 }
+
 .form-select {
   margin-top: 0.3rem;
   border: 1px solid #bbb;
@@ -369,6 +385,7 @@ h1 {
   padding: 0.4rem;
   cursor: pointer;
 }
+
 /* Loading */
 .loading-overlay {
   display: flex;
@@ -376,6 +393,7 @@ h1 {
   align-items: center;
   margin-top: 2rem;
 }
+
 .spinner {
   width: 32px;
   height: 32px;
@@ -385,22 +403,22 @@ h1 {
   animation: spin 1s infinite linear;
   margin-bottom: 0.5rem;
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
+
 /* 主題卡片列表 */
 .test-cards {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  width: auto;
-  max-width: none;
 }
+
 .test-card {
-  width: 800px;
   background-color: #fffdfa;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -409,42 +427,49 @@ h1 {
   cursor: pointer;
   box-sizing: border-box;
 }
+
 .test-card:hover {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .title-row {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
+
 .title-row h3 {
   margin: 0;
   font-size: 1.1rem;
   color: #444;
   font-weight: bold;
 }
+
 .people-count {
   color: #888;
   font-size: 0.85rem;
 }
+
 .test-score {
   font-size: 0.9rem;
   color: #bf360c;
   font-weight: bold;
 }
+
 .test-detail {
-  width: 100%;
   background: #fffce6;
   padding: 0.8rem;
   border-radius: 4px;
   overflow: hidden;
   box-sizing: border-box;
 }
+
 /* 使用者卡 */
 .user-card {
   background: #fefdf9;
@@ -455,51 +480,62 @@ h1 {
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
+
 .user-card:hover {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
+
 .user-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .user-header h4 {
   margin: 0;
   color: #444;
   font-size: 1rem;
   font-weight: bold;
 }
+
 .user-score {
   font-size: 0.9rem;
   font-weight: bold;
 }
+
 .score-high {
   color: #388e3c;
 }
+
 .score-low {
   color: #ffa726;
 }
+
 .test-time {
   font-size: 0.85rem;
   color: #777;
   margin-top: 0.3rem;
   margin-bottom: 0.5rem;
 }
+
 .user-detail {
   margin-top: 0.5rem;
   background: #fff;
   padding: 0.6rem;
   border-radius: 4px;
 }
+
 .qa-item {
   margin-bottom: 1rem;
   line-height: 1.5;
 }
+
 .qa-question {
   font-weight: bold;
   color: #5d4037;
   margin-bottom: 0.2rem;
 }
+
 .qa-answer {
   margin-left: 1rem;
   font-size: 1rem;
@@ -509,38 +545,41 @@ h1 {
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
 }
+
 /* 卡片進場/退場 */
 .card-transition-enter-active,
 .card-transition-leave-active {
   transition: all 0.3s ease;
 }
+
 .card-transition-enter-from,
 .card-transition-leave-to {
   opacity: 0;
   transform: translateY(-10px);
 }
+
 /* 展開高度動畫 */
 .expand-detail-enter-active,
 .expand-detail-leave-active {
   transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
 }
+
 .expand-detail-enter-from,
 .expand-detail-leave-to {
   max-height: 0;
   opacity: 0;
   padding: 0;
 }
+
 .expand-detail-enter-to,
 .expand-detail-leave-from {
   max-height: 2000px;
   opacity: 1;
 }
-@media screen and (max-width: 600px) {
+
+@media screen and (max-width: 800px) {
   .admin-page {
-    font-size: 20px;
-  }
-  .test-cards {
-    max-width: 100%;
+    font-size: 16px;
   }
 }
 </style>

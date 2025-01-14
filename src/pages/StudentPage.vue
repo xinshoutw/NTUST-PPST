@@ -8,23 +8,23 @@
         <div class="form-group">
           <label>學號</label>
           <input
-            v-model="username"
-            type="text"
-            name="username"
-            class="form-input"
-            placeholder="請輸入學號"
-            required
+              v-model="username"
+              type="text"
+              name="username"
+              class="form-input"
+              placeholder="請輸入學號"
+              required
           />
         </div>
         <div class="form-group">
           <label>密碼</label>
           <input
-            v-model="password"
-            type="password"
-            name="password"
-            class="form-input"
-            placeholder="請輸入密碼"
-            required
+              v-model="password"
+              type="password"
+              name="password"
+              class="form-input"
+              placeholder="請輸入密碼"
+              required
           />
         </div>
         <button type="submit" class="btn-login">登入</button>
@@ -41,14 +41,20 @@
     <!-- 登入後顯示量表資訊 -->
     <div v-else>
       <p class="welcome-text">
-        Hello!, {{ studentInfo?.student_id }} | {{ studentInfo?.student_name }}
+        Hello, {{ studentInfo?.student_id }} | {{ studentInfo?.student_name }}
       </p>
-      <transition-group name="card-transition" tag="div" class="card-list">
+      <transition-group
+          name="card-transition"
+          tag="div"
+          class="card-list"
+          :style="{ width: cardWidth }"
+      >
         <div
-          class="test-card"
-          v-for="(test, index) in testsDataSorted"
-          :key="test.test_name + index"
-          @click="toggleDetail(index)"
+            class="test-card"
+            v-for="(test, index) in testsDataSorted"
+            :key="test.test_name + index"
+            @click="toggleDetail(index)"
+            :style="{ width: cardWidth }"
         >
           <div class="card-header">
             <h3>{{ test.test_name }}</h3>
@@ -58,9 +64,9 @@
           <transition name="expand-detail">
             <div v-if="showDetailIndex === index" class="test-detail">
               <div
-                v-for="(qa, i) in test.question_answer || test.questions"
-                :key="i"
-                class="qa-item"
+                  v-for="(qa, i) in test.question_answer || test.questions"
+                  :key="i"
+                  class="qa-item"
               >
                 <div class="qa-question">{{ qa.q }}</div>
                 <div class="qa-answer">{{ qa.a }}</div>
@@ -74,9 +80,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useStudentStore } from '@/store/studentStore'
-import { get_user_data } from '@/utils/api'
+import {computed, ref} from 'vue'
+import {useStudentStore} from '@/store/studentStore'
+import {get_user_data} from '@/utils/api'
+import {useCardWidth} from '@/utils/useCardWidth'
 
 /**
  * 存放使用者在登入表單中輸入的學號
@@ -105,6 +112,11 @@ const isLoading = ref(false)
 const showDetailIndex = ref<number | null>(null)
 
 /**
+ * 顯示字卡寬度
+ */
+const {cardWidth} = useCardWidth()
+
+/**
  * 取得 studentStore，保存了當前學生資訊與量表
  */
 const store = useStudentStore()
@@ -125,7 +137,7 @@ const testsData = computed(() => store.testsData)
  */
 const testsDataSorted = computed(() => {
   return [...testsData.value].sort(
-    (a, b) => new Date(b.test_time).getTime() - new Date(a.test_time).getTime()
+      (a, b) => new Date(b.test_time).getTime() - new Date(a.test_time).getTime()
   )
 })
 
@@ -178,6 +190,9 @@ function toggleDetail(index: number) {
 </script>
 
 <style scoped>
+/* ====================================== */
+/* 1. 最外層 student-page 設定            */
+/* ====================================== */
 .student-page {
   display: flex;
   flex-direction: column;
@@ -186,6 +201,7 @@ function toggleDetail(index: number) {
   min-height: 100vh;
   color: #444;
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 .student-page h1 {
@@ -193,6 +209,9 @@ function toggleDetail(index: number) {
   font-size: 1.5rem;
 }
 
+/* ====================================== */
+/* 2. 登入表單區塊 (login-container)      */
+/* ====================================== */
 .login-container {
   width: 100%;
   max-width: 400px;
@@ -230,6 +249,7 @@ function toggleDetail(index: number) {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .btn-login:hover {
   background-color: #ff9100;
 }
@@ -240,12 +260,16 @@ function toggleDetail(index: number) {
   text-align: center;
 }
 
+/* ====================================== */
+/* 3. 載入中 Spinner                      */
+/* ====================================== */
 .loading-overlay {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 2rem;
 }
+
 .spinner {
   width: 32px;
   height: 32px;
@@ -255,6 +279,7 @@ function toggleDetail(index: number) {
   animation: spin 1s infinite linear;
   margin-bottom: 0.5rem;
 }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -267,26 +292,46 @@ function toggleDetail(index: number) {
   font-size: 1.2rem;
 }
 
+/* ====================================== */
+/* 4. 卡片列表 (card-list)               */
+/* ====================================== */
 .card-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 100%;
-  margin: 1rem 0;
+  margin: 0 auto;
+
   align-items: center;
   padding: 0 1rem;
+  box-sizing: border-box;
 }
 
+/* ====================================== */
+/* 5. 單張卡片 (test-card)               */
+/* ====================================== */
 .test-card {
-  background-color: #fffdfa;
+  display: block;
+  box-sizing: border-box;
+  margin: 0 auto;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #fffdfa;
   padding: 1rem;
   cursor: pointer;
   transition: box-shadow 0.3s;
-  width: 800px; /* 桌機最大寬度 */
-  box-sizing: border-box;
+
+  /* 防止過長文字撐破 */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
+
+.card-header,
+.test-time,
+.test-detail {
+  width: 100%;
+  white-space: normal;
+}
+
 .test-card:hover {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
@@ -297,38 +342,44 @@ function toggleDetail(index: number) {
   align-items: center;
   margin-bottom: 0.3rem;
 }
+
 .card-header h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: bold;
   color: #444;
 }
+
 .test-score {
   font-size: 0.9rem;
   color: #bf360c;
   font-weight: bold;
 }
+
 .test-time {
   font-size: 0.85rem;
   color: #777;
   margin-bottom: 0.5rem;
 }
+
 .test-detail {
   margin-top: 0.5rem;
   background: #fffce6;
   padding: 0.8rem;
   border-radius: 4px;
-  overflow: hidden;
 }
+
 .qa-item {
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
+
 .qa-question {
   font-weight: bold;
   color: #5d4037;
   margin-bottom: 0.3rem;
 }
+
 .qa-answer {
   margin-left: 1rem;
   font-size: 1rem;
@@ -339,26 +390,33 @@ function toggleDetail(index: number) {
   border-radius: 4px;
 }
 
-/* 進場/退場動效 */
+/* ====================================== */
+/* 6. 卡片進場/退場 & 展開動畫            */
+/* ====================================== */
+/* 避免使用 transition: all; 以防止 width 也被過場 */
 .card-transition-enter-active,
 .card-transition-leave-active {
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
+
 .card-transition-enter-from,
 .card-transition-leave-to {
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .expand-detail-enter-active,
 .expand-detail-leave-active {
   transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
 }
+
 .expand-detail-enter-from,
 .expand-detail-leave-to {
   max-height: 0;
   opacity: 0;
   padding: 0;
 }
+
 .expand-detail-enter-to,
 .expand-detail-leave-from {
   max-height: 5000px;
@@ -366,12 +424,16 @@ function toggleDetail(index: number) {
   padding: 0.8rem;
 }
 
-@media screen and (max-width: 600px) {
+/* ====================================== */
+/* 7. RWD：小螢幕時改為寬度 100%          */
+/* ====================================== */
+@media screen and (max-width: 800px) {
   .student-page {
     font-size: 17px;
   }
-  .test-card {
-    max-width: 100%;
+
+  .card-list {
+    padding: 0 0.5rem;
   }
 }
 </style>
