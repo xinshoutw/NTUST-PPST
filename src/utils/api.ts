@@ -15,7 +15,7 @@ interface GetUserDataSuccess {
         test_name: string
         test_time: string
         result_scores: Array<{ subject_name: string; score: number }>
-        question_answer: Array<{ q: string; a: number | string }>
+        // question_answer: Array<{ q: string; a: number | string }>
     }>
 }
 

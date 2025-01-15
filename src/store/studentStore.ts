@@ -16,7 +16,7 @@ interface TestData {
     test_name: string
     test_time: string
     result_scores: ScoreData[]
-    question_answer: QuestionAnswer[]
+    // question_answer: QuestionAnswer[]
 }
 
 /**
