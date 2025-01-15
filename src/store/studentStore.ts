@@ -17,7 +17,6 @@ interface TestData {
     test_time: string
     result_scores: ScoreData[]
     question_answer: QuestionAnswer[]
-    questions: QuestionAnswer[]
 }
 
 /**

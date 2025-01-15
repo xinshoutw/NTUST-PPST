@@ -87,7 +87,7 @@
           <transition name="expand-detail">
             <div v-if="showDetailIndex === index" class="test-detail">
               <div
-                  v-for="(qa, i) in test.question_answer || test.questions"
+                  v-for="(qa, i) in test.question_answer"
                   :key="i"
                   class="qa-item"
               >
