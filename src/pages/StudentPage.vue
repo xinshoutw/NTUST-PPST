@@ -84,18 +84,18 @@
           <!-- 時間戳：卡片下方左側 -->
           <p class="test-time">{{ formatTime(test.test_time) }}</p>
 
-          <transition name="expand-detail">
-            <div v-if="showDetailIndex === index" class="test-detail">
-              <div
-                  v-for="(qa, i) in test.question_answer"
-                  :key="i"
-                  class="qa-item"
-              >
-                <div class="qa-question">{{ qa.q }}</div>
-                <div class="qa-answer">{{ qa.a }}</div>
-              </div>
-            </div>
-          </transition>
+<!--          <transition name="expand-detail">-->
+<!--            <div v-if="showDetailIndex === index" class="test-detail">-->
+<!--              <div-->
+<!--                  v-for="(qa, i) in test.question_answer"-->
+<!--                  :key="i"-->
+<!--                  class="qa-item"-->
+<!--              >-->
+<!--                <div class="qa-question">{{ qa.q }}</div>-->
+<!--                <div class="qa-answer">{{ qa.a }}</div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </transition>-->
         </div>
       </transition-group>
     </div>
