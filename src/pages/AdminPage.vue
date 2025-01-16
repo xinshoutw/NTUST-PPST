@@ -178,7 +178,6 @@ async function handleLogin() {
   // 若哈希不符合，直接錯誤，不呼叫後端
   if (hashed !== correctHash) {
     errorMessage.value = 'Token錯誤，無法取得資料'
-    isLoading.value = false
     return
   }
 
