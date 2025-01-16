@@ -43,27 +43,32 @@
       <p class="welcome-text">
         Hello, {{ studentInfo?.student_id }} | {{ studentInfo?.student_name }}
       </p>
-      <transition-group
-          :style="{ width: cardWidth }"
-          class="card-list"
-          name="card-transition"
-          tag="div"
-      >
-        <div
-            v-for="(test, index) in testsDataSorted"
-            :key="test.test_name + index"
+
+      <div v-if="testsDataSorted.length === 0" class="no-records">
+        <p>今日無填寫記錄</p>
+      </div>
+      <div v-else>
+        <transition-group
             :style="{ width: cardWidth }"
-            class="test-card"
-            @click="toggleDetail(index)"
+            class="card-list"
+            name="card-transition"
+            tag="div"
         >
-          <!-- 左側標題 + 右側分數區塊 -->
-          <div class="header-title">
-            <div class="title-row">
-              <h3>{{ test.test_name }}</h3>
-            </div>
-            <div class="header-scores">
-              <div class="score-badge-container">
-                <template v-if="test.result_scores && test.result_scores.length > 0">
+          <div
+              v-for="(test, index) in testsDataSorted"
+              :key="test.test_name + index"
+              :style="{ width: cardWidth }"
+              class="test-card"
+              @click="toggleDetail(index)"
+          >
+            <!-- 左側標題 + 右側分數區塊 -->
+            <div class="header-title">
+              <div class="title-row">
+                <h3>{{ test.test_name }}</h3>
+              </div>
+              <div class="header-scores">
+                <div class="score-badge-container">
+                  <template v-if="test.result_scores && test.result_scores.length > 0">
                   <span
                       v-for="(scoreItem, sIdx) in test.result_scores"
                       :key="sIdx"
@@ -73,31 +78,32 @@
                     <span class="badge-space"></span>
                     {{ scoreItem.score }}
                   </span>
-                </template>
-                <template v-else>
-                  <span class="no-score">無</span>
-                </template>
+                  </template>
+                  <template v-else>
+                    <span class="no-score">無</span>
+                  </template>
+                </div>
               </div>
             </div>
+
+            <!-- 時間戳：卡片下方左側 -->
+            <p class="test-time">{{ formatTime(test.test_time) }}</p>
+
+            <!--          <transition name="expand-detail">-->
+            <!--            <div v-if="showDetailIndex === index" class="test-detail">-->
+            <!--              <div-->
+            <!--                  v-for="(qa, i) in test.question_answer"-->
+            <!--                  :key="i"-->
+            <!--                  class="qa-item"-->
+            <!--              >-->
+            <!--                <div class="qa-question">{{ qa.q }}</div>-->
+            <!--                <div class="qa-answer">{{ qa.a }}</div>-->
+            <!--              </div>-->
+            <!--            </div>-->
+            <!--          </transition>-->
           </div>
-
-          <!-- 時間戳：卡片下方左側 -->
-          <p class="test-time">{{ formatTime(test.test_time) }}</p>
-
-<!--          <transition name="expand-detail">-->
-<!--            <div v-if="showDetailIndex === index" class="test-detail">-->
-<!--              <div-->
-<!--                  v-for="(qa, i) in test.question_answer"-->
-<!--                  :key="i"-->
-<!--                  class="qa-item"-->
-<!--              >-->
-<!--                <div class="qa-question">{{ qa.q }}</div>-->
-<!--                <div class="qa-answer">{{ qa.a }}</div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </transition>-->
-        </div>
-      </transition-group>
+        </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -470,6 +476,16 @@ function toggleDetail(index: number) {
   padding: 0.8rem;
 }
 
+/* 今日無填寫記錄 */
+.no-records {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 1.2rem;
+  color: #777;
+}
+
 /* RWD：小螢幕時改為寬度 100% */
 @media screen and (max-width: 900px) {
   .student-page {
@@ -488,4 +504,5 @@ function toggleDetail(index: number) {
     font-size: 12px;
   }
 }
+
 </style>
