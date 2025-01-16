@@ -155,19 +155,40 @@ const openedUserIndices = ref<{ [testIndex: number]: number[] }>({})
 /* 取得字卡寬度 */
 const {cardWidth} = useCardWidth()
 
+
+/**
+ * SHA512 校驗
+ */
+async function sha512(str: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(str)
+  const hashBuffer = await crypto.subtle.digest('SHA-512', msgUint8)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 /**
  * 發送 Token 到後端以取得管理者數據
  */
 async function handleLogin() {
   isLoading.value = true
   errorMessage.value = ''
+
+  const hashed = await sha512(adminTokenInput.value)
+  const correctHash = '688338ab4e75e1d220546608ad0ee06850ea63dae0c42ed7a6b43f9be60e32d3015c2e820e82622153b4e0521b6785c3eddde3402b7abdfd33e97c3a4beb3775'
+
+  // 若哈希不符合，直接錯誤，不呼叫後端
+  if (hashed !== correctHash) {
+    errorMessage.value = 'Token錯誤，無法取得資料'
+    return
+  }
+
   try {
     const res = await get_data(adminTokenInput.value)
     if (res.status) {
       adminStore.setToken(adminTokenInput.value)
       adminStore.setAggregatedData(res.data || [])
     } else {
-      errorMessage.value = '無法取得資料'
+      errorMessage.value = 'Token錯誤，無法取得資料'
     }
   } catch {
     errorMessage.value = '系統錯誤'
