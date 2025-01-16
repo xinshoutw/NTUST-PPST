@@ -170,7 +170,6 @@ async function sha512(str: string): Promise<string> {
  * 發送 Token 到後端以取得管理者數據
  */
 async function handleLogin() {
-  isLoading.value = true
   errorMessage.value = ''
 
   const hashed = await sha512(adminTokenInput.value)
@@ -179,9 +178,11 @@ async function handleLogin() {
   // 若哈希不符合，直接錯誤，不呼叫後端
   if (hashed !== correctHash) {
     errorMessage.value = 'Token錯誤，無法取得資料'
+    isLoading.value = false
     return
   }
 
+  isLoading.value = true
   try {
     const res = await get_data(adminTokenInput.value)
     if (res.status) {
