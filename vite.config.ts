@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 
 export default defineConfig({
-    base: '/ntust-work-PPST/',
     plugins: [vue()],
     resolve: {
         alias: {
