@@ -1,6 +1,6 @@
 <template>
   <div class="admin-page">
-    <h1>正向心理學 - 管理者後台</h1>
+    <h1>普通心理學 - 管理者後台</h1>
 
     <!-- 未登入：顯示登入表單 -->
     <div v-if="!token && !isLoading" class="login-container">

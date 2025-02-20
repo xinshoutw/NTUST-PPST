@@ -1,6 +1,6 @@
 <template>
   <div class="student-page">
-    <h1 v-if="!studentInfo">正向心理學 - 學生登入</h1>
+    <h1 v-if="!studentInfo">普通心理學 - 學生登入</h1>
 
     <!-- 未登入：顯示登入表單 -->
     <div v-if="!studentInfo && !isLoading" class="login-container">
