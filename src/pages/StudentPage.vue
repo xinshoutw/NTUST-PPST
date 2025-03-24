@@ -6,12 +6,12 @@
     <div v-if="!studentInfo && !isLoading" class="login-container">
       <form class="login-form" @submit.prevent="handleLogin">
         <div class="form-group">
-          <label>學號</label>
+          <label>學號(S-B12345678)</label>
           <input
               v-model="username"
               class="form-input"
               name="username"
-              placeholder="請輸入學號"
+              placeholder="請輸入學號(S-B12345678)"
               required
               type="text"
           />
