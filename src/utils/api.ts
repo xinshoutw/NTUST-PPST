@@ -3,7 +3,7 @@ import axios from 'axios'
 /**
  * Google Apps Script Endpoint
  */
-const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyecx6IaUNPft9gLr6r6DziyFWxfG3OXRxPCi5PpnSETzp7JNqRFqn80RVwkPmT4icJ/exec'
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbziRZ9m6q52dBwnUSBolcC-q6ia8nd_c3C2d91IsgXpUXN30nnLjVKzrtyZaq2hguvcLQ/exec'
 
 /* ========== 學生登入/取得資料 ========== */
 interface GetUserDataSuccess {
